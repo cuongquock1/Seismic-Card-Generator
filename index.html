@@ -1,176 +1,169 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Seismic PFP Generator Pro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seismic PFP Generator Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
 
-<style>
-html, body {
-    margin: 0;
-    width: 100%;
-    height: 100%;
-    background: #000;
-    font-family: Arial, sans-serif;
-    overflow: hidden;
-}
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            font-family: 'Orbitron', sans-serif;
+            overflow: hidden;
+        }
 
-#game-container {
-    width: 100vw;
-    height: 100vh;
-    background: url('anh2.png') center/cover no-repeat;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            background: url('anh2.png') center/cover no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-#welcome-screen {
-    position: absolute;
-    z-index: 100;
-    background: rgba(0,0,0,0.9);
-    padding: 50px;
-    border-radius: 16px;
-    text-align: center;
-    color: white;
-    border: 2px solid #a442f5;
-    box-shadow: 0 0 20px #a442f5;
-}
+        #welcome-screen {
+            position: absolute;
+            z-index: 100;
+            background: rgba(10, 5, 20, 0.95);
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            color: white;
+            border: 2px solid #a442f5;
+            box-shadow: 0 0 30px #a442f5;
+        }
 
-button {
-    padding: 14px 40px;
-    background: #a442f5;
-    border: none;
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-}
+        button {
+            padding: 15px 45px;
+            background: #a442f5;
+            border: none;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: bold;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
 
-#generator-ui {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-}
+        button:hover {
+            background: #ca82ff;
+            transform: scale(1.05);
+        }
 
-#pfp-wrapper {
-    position: relative;
-    width: 500px;
-    height: 700px;
-    min-width: 500px;
-    min-height: 700px;
-    max-width: 500px;
-    max-height: 700px;
-}
+        #generator-ui {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
 
-/* Ảnh người dùng */
-#user-image-container {
-    position: absolute;
-    width: 380px;
-    height: 380px;
-    top: 60px;
-    left: 60px;
-    z-index: 1;
-    cursor: move;
-    display: none;
-    pointer-events: auto;
-}
+        /* KHU VỰC CHỤP ẢNH - Cố định kích thước chuẩn */
+        #pfp-wrapper {
+            position: relative;
+            width: 500px;
+            height: 700px;
+            background: #111;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            overflow: hidden; /* Cắt phần thừa của ảnh user */
+        }
 
-#user-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transform: scale(1);
-}
+        /* Lớp 1: Ảnh người dùng */
+        #user-image-container {
+            position: absolute;
+            width: 390px;
+            height: 465px;
+            top: 42px;
+            left: 53px;
+            z-index: 1;
+            cursor: move;
+            display: none;
+        }
 
-/* Resizer */
-.resizer {
-    width: 14px;
-    height: 14px;
-    background: #00ffcc;
-    border-radius: 50%;
-    border: 2px solid #fff;
-    position: absolute;
-    z-index: 5;
-}
-.tl { top: -7px; left: -7px; cursor: nwse-resize; }
-.tr { top: -7px; right: -7px; cursor: nesw-resize; }
-.bl { bottom: -7px; left: -7px; cursor: nesw-resize; }
-.br { bottom: -7px; right: -7px; cursor: nwse-resize; }
+        #user-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-/* Khung PFP */
-#pfp-frame {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 3;
-    pointer-events: none;
-}
+        /* Lớp 2: Khung PFP (Trong suốt ở giữa) */
+        #pfp-frame {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 500px;
+            height: 700px;
+            z-index: 2;
+            pointer-events: none; /* Để có thể click xuyên qua khung vào ảnh user */
+        }
 
-/* Text overlay – CĂN BẰNG PX */
-.input-overlay {
-    position: absolute;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: #fff;
-    font-size: 24px;
-    font-weight: bold;
-    font-family: 'Courier New', monospace;
-    letter-spacing: 1px;
-    line-height: 1.2;
-    z-index: 10;
-    pointer-events: auto; /* ⭐ BẮT BUỘC */
-}
+        /* Lớp 3: Chữ gõ trực tiếp */
+        .input-overlay {
+            position: absolute;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            z-index: 10;
+            white-space: nowrap;
+            text-transform: uppercase;
+        }
 
-/* TOẠ ĐỘ CHUẨN THEO anh1.png */
-#input-name {
-    left: 100px;
-    top: 525px;
-    width: 200px;
-	
-    font-family: 'Orbitron', sans-serif;
-    font-size: 26px;
-    letter-spacing: 1.5px;
-}
+        #input-name {
+            left: 110px;
+            top: 535px;
+            width: 250px;
+            font-size: 26px;
+            letter-spacing: 2px;
+        }
 
-#input-magnitude {
-    left: 200px;
-    top: 570px;
-    width: 120px;
-	
-	font-family: 'Orbitron', sans-serif;
-    font-size: 22px;
-    letter-spacing: 1px;
-}
+        #input-magnitude {
+            left: 215px;
+            top: 588px;
+            width: 150px;
+            font-size: 24px;
+            letter-spacing: 1px;
+        }
 
-#controls {
-    margin-top: 15px;
-    background: rgba(0,0,0,0.85);
-    padding: 15px;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-}
-.upload-btn {
-    padding: 14px 40px;
-    background: #a442f5;
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 8px;
-    text-align: center;
-    user-select: none;
-    box-shadow: 0 0 12px rgba(164,66,245,0.6);
-    font-family: 'Orbitron', sans-serif;
-}
+        /* Nút điều khiển bên dưới */
+        #controls {
+            margin-top: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 15px 30px;
+            border-radius: 50px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            border: 1px solid #333;
+        }
 
-.upload-btn:hover {
-    background: #c066ff;
-}
-</style>
+        .upload-btn {
+            color: #aaa;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 1px solid #aaa;
+        }
+
+        /* Điểm thu phóng */
+        .resizer {
+            width: 16px;
+            height: 16px;
+            background: #a442f5;
+            border: 2px solid white;
+            position: absolute;
+            right: -8px;
+            bottom: -8px;
+            z-index: 15;
+            cursor: nwse-resize;
+            border-radius: 50%;
+        }
+    </style>
 </head>
 
 <body>
@@ -180,58 +173,51 @@ button {
 </audio>
 
 <div id="game-container">
-
-<div id="welcome-screen">
-    <h1>SEISMIC PFP GENERATOR</h1>
-    <button onclick="startGame()">START GAME</button>
-</div>
-
-<div id="generator-ui">
-
-<div id="pfp-wrapper">
-
-    <div id="user-image-container">
-        <img id="user-image">
-        <div class="resizer br"></div>
+    <div id="welcome-screen">
+        <h1 style="letter-spacing: 5px;">SEISMIC PFP</h1>
+        <p style="color: #888; margin-bottom: 30px;">GENERATOR PRO V1.0</p>
+        <button onclick="startGame()">START GENERATOR</button>
     </div>
 
-    <img id="pfp-frame" src="anh1.png">
+    <div id="generator-ui">
+        <div id="pfp-wrapper">
+            <div id="user-image-container">
+                <img id="user-image">
+                <div class="resizer" id="resizer"></div>
+            </div>
 
-    <div id="input-name" class="input-overlay" contenteditable="true"></div>
-    <div id="input-magnitude" class="input-overlay" contenteditable="true"></div>
+            <img id="pfp-frame" src="anh1.png">
 
-</div>
+            <div id="input-name" class="input-overlay" contenteditable="true" spellcheck="false">PLAYER_NAME</div>
+            <div id="input-magnitude" class="input-overlay" contenteditable="true" spellcheck="false">9.9</div>
+        </div>
 
-<div id="controls">
-    <input type="file" id="upload-pfp" accept="image/*" hidden>
-
-    <label for="upload-pfp" class="upload-btn">
-        UPLOAD YOUR PFP
-    </label>
-
-    <button onclick="downloadImage()">DOWNLOAD PFP</button>
-</div>
-
-</div>
+        <div id="controls">
+            <input type="file" id="upload-pfp" accept="image/*" hidden>
+            <label for="upload-pfp" class="upload-btn">CHANGE IMAGE</label>
+            <button onclick="downloadImage()">DOWNLOAD IMAGE</button>
+        </div>
+        <p style="color: #555; font-size: 11px; margin-top: 10px;">Drag to Move • Resize Circle to Scale • Click Text to Type</p>
+    </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
 const music = document.getElementById('bg-music');
-music.volume = 0.25;
+const upload = document.getElementById('upload-pfp');
+const container = document.getElementById('user-image-container');
+const img = document.getElementById('user-image');
+const resizer = document.getElementById('resizer');
 
 function startGame(){
     document.getElementById('welcome-screen').style.display='none';
     document.getElementById('generator-ui').style.display='flex';
+    music.volume = 0.25;
     music.play().catch(()=>{});
 }
 
-/* Upload ảnh – SET SIZE CHUẨN */
-const upload = document.getElementById('upload-pfp');
-const container = document.getElementById('user-image-container');
-const img = document.getElementById('user-image');
-
+/* Xử lý Upload */
 upload.onchange = e => {
     const file = e.target.files[0];
     if(!file) return;
@@ -239,58 +225,74 @@ upload.onchange = e => {
     reader.onload = ev => {
         img.src = ev.target.result;
         container.style.display = 'block';
-        container.style.width = '390px';
-        container.style.height = '465px';
-        container.style.left = '53px';
-        container.style.top = '42px';
     };
     reader.readAsDataURL(file);
 };
 
-/* Drag & Resize */
-let drag=false, resize=false, sx, sy, sw, sh, sl, st, h;
+/* Drag & Resize System */
+let isDragging = false, isResizing = false;
+let startX, startY, startWidth, startHeight, startLeft, startTop;
 
-container.onmousedown = e=>{
-    if(e.target.tagName === 'INPUT') return; // ⭐ QUAN TRỌNG
-
-    sx=e.clientX; sy=e.clientY;
-    sw=container.offsetWidth; sh=container.offsetHeight;
-    sl=container.offsetLeft; st=container.offsetTop;
-
-    if(e.target.classList.contains('resizer')){
-        resize=true; h=e.target;
-    } else drag=true;
-};
-
-window.onmousemove = e=>{
-    if(drag){
-        container.style.left = sl + e.clientX - sx + 'px';
-        container.style.top  = st + e.clientY - sy + 'px';
+// Bắt đầu sự kiện
+document.addEventListener('mousedown', e => {
+    if(e.target === resizer) {
+        isResizing = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startWidth = container.offsetWidth;
+        startHeight = container.offsetHeight;
+        e.preventDefault();
+    } else if (e.target === img) {
+        isDragging = true;
+        startX = e.clientX - container.offsetLeft;
+        startY = e.clientY - container.offsetTop;
+        e.preventDefault();
     }
-    if(resize){
-        const dx=e.clientX-sx, dy=e.clientY-sy;
-        if(h.classList.contains('br')){
-            container.style.width=sw+dx+'px';
-            container.style.height=sh+dy+'px';
-        }
+});
+
+// Xử lý di chuyển
+document.addEventListener('mousemove', e => {
+    if(isDragging) {
+        container.style.left = (e.clientX - startX) + 'px';
+        container.style.top = (e.clientY - startY) + 'px';
     }
-};
+    if(isResizing) {
+        const width = startWidth + (e.clientX - startX);
+        const height = startHeight + (e.clientY - startY);
+        if(width > 50) container.style.width = width + 'px';
+        if(height > 50) container.style.height = height + 'px';
+    }
+});
 
-window.onmouseup=()=>{drag=false; resize=false};
+document.addEventListener('mouseup', () => {
+    isDragging = false;
+    isResizing = false;
+});
 
+/* DOWNLOAD HÀM QUAN TRỌNG */
 function downloadImage(){
-    document.querySelectorAll('.resizer').forEach(r=>r.style.display='none');
+    // 1. Tạm ẩn Resizer để không bị dính vào ảnh tải về
+    resizer.style.opacity = '0';
+    
+    const wrapper = document.getElementById('pfp-wrapper');
 
-    html2canvas(document.getElementById('pfp-wrapper'), {
+    // 2. Sử dụng html2canvas với cấu hình cao nhất
+    html2canvas(wrapper, {
         backgroundColor: null,
-        scale: 1,
-        useCORS: true,
-    }).then(c=>{
-        const a=document.createElement('a');
-        a.download='Seismic_PFP.png';
-        a.href=c.toDataURL('image/png');
-        a.click();
-        document.querySelectorAll('.resizer').forEach(r=>r.style.display='block');
+        scale: 2, // Tăng độ nét gấp đôi
+        useCORS: true, // Cho phép load ảnh từ nguồn khác nếu có
+        allowTaint: true,
+        logging: false,
+        width: 500,
+        height: 700
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'Seismic_PFP_Export.png';
+        link.href = canvas.toDataURL('image/png', 1.0);
+        link.click();
+        
+        // 3. Hiện lại Resizer sau khi chụp xong
+        resizer.style.opacity = '1';
     });
 }
 </script>
