@@ -197,8 +197,8 @@ button {
 
     <img id="pfp-frame" src="anh1.png">
 
-    <input id="input-name" class="input-overlay" placeholder="">
-    <input id="input-magnitude" class="input-overlay" placeholder="">
+    <div id="input-name" class="input-overlay" contenteditable="true"></div>
+    <div id="input-magnitude" class="input-overlay" contenteditable="true"></div>
 
 </div>
 
@@ -283,10 +283,8 @@ function downloadImage(){
 
     html2canvas(document.getElementById('pfp-wrapper'), {
         backgroundColor: null,
-        scale: 2,
+        scale: 1,
         useCORS: true,
-        width: 500,
-        height: 700
     }).then(c=>{
         const a=document.createElement('a');
         a.download='Seismic_PFP.png';
